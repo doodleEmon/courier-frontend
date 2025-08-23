@@ -72,6 +72,7 @@ export interface RegisterData {
     role?: 'Customer' | 'Agent' | 'Admin';
     dateOfBirth?: string;
     gender?: 'male' | 'female' | 'other';
+    avatar: string;
 }
 
 // API Response Types

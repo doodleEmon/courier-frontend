@@ -1,4 +1,3 @@
-// src/redux/features/auth/authActions.ts
 import { BASE_URL } from '@/constants';
 import { LoginCredentials, RegisterData } from '@/types/type';
 import { createAsyncThunk } from '@reduxjs/toolkit';

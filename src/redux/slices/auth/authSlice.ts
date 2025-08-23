@@ -1,16 +1,7 @@
-// src/redux/features/auth/authSlice.ts
 import { loginUser, registerUser } from '@/redux/actions/auth/authActions';
+import { User } from '@/types/type';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-// Define a type for the user object
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: 'Admin' | 'Delivery Agent' | 'Customer';
-}
-
-// Define a type for the slice state, including loading and error
 interface AuthState {
     user: User | null;
     token: string | null;
@@ -29,7 +20,6 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        // This reducer can be used to manually set user data if needed
         setUser: (state, action: PayloadAction<{ user: User; token: string }>) => {
             state.user = action.payload.user;
             state.token = action.payload.token;
@@ -51,12 +41,12 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload.data.user; // Adjust based on your API response structure
+                state.user = action.payload.data.user;
                 state.token = action.payload.data.token;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload; // This is the payload from rejectWithValue
+                state.error = action.payload;
             })
             // Register User
             .addCase(registerUser.pending, (state) => {
@@ -64,10 +54,10 @@ const authSlice = createSlice({
                 state.error = null;
             })
             .addCase(registerUser.fulfilled, (state, action) => {
+                console.log(action.payload);
                 state.loading = false;
-                // You might want to automatically log in the user upon successful registration
-                state.user = action.payload.data.user;
-                state.token = action.payload.data.token;
+                state.user = action.payload;
+                state.token = action.payload.token;
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;

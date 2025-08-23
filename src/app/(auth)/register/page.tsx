@@ -1,36 +1,33 @@
-'use client'
+'use client';
+
+import { emailRegex, phoneRegex } from '@/constants'
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { BiLeftArrow, BiLeftArrowAlt } from 'react-icons/bi'
+import { BiLeftArrowAlt } from 'react-icons/bi'
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
+import { registerUser } from '@/redux/actions/auth/authActions';
 
 const initialState = {
     name: '',
     email: '',
     phone: '',
     password: '',
-    avatar: '',
     dateOfBirth: '',
     gender: '',
     role: 'Customer',
 }
 
-const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
-const phoneRegex = /^(\+88)?01[3-9]\d{8}$/
-
 export default function Register() {
-    const [form, setForm] = useState(initialState)
-    const [errors, setErrors] = useState<{ [key: string]: string }>({})
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+    const [form, setForm] = useState(initialState);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    const dispatch = useDispatch<AppDispatch>();
+    const { loading, error } = useSelector((state: RootState) => state.users);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type, files } = e.target as any
-        if (type === 'file' && files.length) {
-            const file = files[0]
-            setForm({ ...form, avatar: file })
-            setAvatarPreview(URL.createObjectURL(file))
-        } else {
-            setForm({ ...form, [name]: value })
-        }
+        const { name, value } = e.target
+        setForm({ ...form, [name]: value })
     }
 
     const validate = () => {
@@ -48,14 +45,25 @@ export default function Register() {
     }
 
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        const validationErrors = validate()
-        setErrors(validationErrors)
+        e.preventDefault();
+        const validationErrors = validate();
+        setErrors(validationErrors);
+
         if (Object.keys(validationErrors).length === 0) {
-            // Submit logic here
-            alert('Registration successful!\n' + JSON.stringify(form, null, 2))
+            const payload = {
+                name: form.name,
+                email: form.email,
+                phone: form.phone,
+                password: form.password,
+                dateOfBirth: form.dateOfBirth,
+                gender: form.gender as "male" | "female" | "other",
+                role: form.role as "Customer" | "Agent" | "Admin",
+                avatar: '',
+            };
+
+            dispatch(registerUser(payload));
         }
-    }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 relative p-5">
@@ -122,19 +130,6 @@ export default function Register() {
                     {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                 </div>
                 <div>
-                    <label className="block mb-1 font-medium">Avatar</label>
-                    <input
-                        type="file"
-                        name="avatar"
-                        accept="image/*"
-                        onChange={handleChange}
-                        className="w-full"
-                    />
-                    {avatarPreview && (
-                        <img src={avatarPreview} alt="Avatar Preview" className="mt-2 w-16 h-16 rounded-full object-cover" />
-                    )}
-                </div>
-                <div>
                     <label className="block mb-1 font-medium">Date of Birth</label>
                     <input
                         type="date"
@@ -176,9 +171,11 @@ export default function Register() {
                 <button
                     type="submit"
                     className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                    disabled={loading}
                 >
-                    Register
+                    {loading ? 'Registering...' : 'Register'}
                 </button>
+                {error && <p className="text-red-500 text-sm text-center mt-2">{error}</p>}
                 <div className="text-center text-sm mt-2">
                     <span>Already have an account? </span>
                     <a href="/login" className="text-blue-600 hover:underline">
