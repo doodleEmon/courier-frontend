@@ -27,7 +27,7 @@ export default function Header() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
                     <span className="text-xl font-bold text-blue-600 tracking-tight">
-                        Courier<span className="text-gray-800">Track</span>
+                        Courier<span className="text-gray-800">Xpress</span>
                     </span>
                 </Link>
                 {/* Navigation */}
