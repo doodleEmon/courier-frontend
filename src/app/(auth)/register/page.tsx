@@ -7,6 +7,9 @@ import { BiLeftArrowAlt } from 'react-icons/bi'
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { registerUser } from '@/redux/actions/auth/authActions';
+import toast from 'react-hot-toast';
+import { Router } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const initialState = {
     name: '',
@@ -24,6 +27,7 @@ export default function Register() {
 
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error } = useSelector((state: RootState) => state.users);
+    const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -61,7 +65,17 @@ export default function Register() {
                 avatar: '',
             };
 
-            dispatch(registerUser(payload));
+            dispatch(registerUser(payload))
+                .unwrap()
+                .then(() => {
+                    toast.success("Registration successful!");
+                    setTimeout(() => {
+                        router.push("/");
+                    }, 1000);
+                })
+                .catch((err) => {
+                    toast.error(err.message || "Registration failed");
+                });
         }
     };
 
@@ -170,7 +184,7 @@ export default function Register() {
                 </div>
                 <button
                     type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition cursor-pointer"
                     disabled={loading}
                 >
                     {loading ? 'Registering...' : 'Register'}
