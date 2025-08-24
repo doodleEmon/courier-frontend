@@ -17,7 +17,6 @@ export const loginUser = createAsyncThunk(
       const data = await response.json();
 
       if (!response.ok) {
-        // Use server error message if available
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
 
@@ -44,7 +43,6 @@ export const registerUser = createAsyncThunk(
       const data = await response.json();
 
       if (!response.ok) {
-        // Use server error message if available
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
 
