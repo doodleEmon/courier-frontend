@@ -37,7 +37,7 @@ export default function Login() {
       .then(() => {
         toast.success("Login successful!");
         setTimeout(() => {
-          router.push("/");
+          router.push("/dashboard");
         }, 1000);
       })
       .catch((err) => {

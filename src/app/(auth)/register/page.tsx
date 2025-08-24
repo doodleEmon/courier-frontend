@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { registerUser } from '@/redux/actions/auth/authActions';
 import toast from 'react-hot-toast';
-import { Router } from 'next/router';
 import { useRouter } from 'next/navigation';
 
 const initialState = {
@@ -26,7 +25,7 @@ export default function Register() {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const dispatch = useDispatch<AppDispatch>();
-    const { loading, error } = useSelector((state: RootState) => state.users);
+    const { loading, error } = useSelector((state: RootState) => state.auth);
     const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -70,8 +69,8 @@ export default function Register() {
                 .then(() => {
                     toast.success("Registration successful!");
                     setTimeout(() => {
-                        router.push("/");
-                    }, 1000);
+                        router.push("/dashboard");
+                    }, 1500);
                 })
                 .catch((err) => {
                     toast.error(err.message || "Registration failed");
