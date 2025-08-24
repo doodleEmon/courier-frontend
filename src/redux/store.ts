@@ -3,7 +3,7 @@ import usersReducer from '@/redux/slices/auth/authSlice'
 
 export const store = configureStore({
     reducer: {
-        users: usersReducer,
+        auth: usersReducer,
     },
 })
 

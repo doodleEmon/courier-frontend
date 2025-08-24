@@ -1,11 +1,23 @@
-'use client'
+"use client"
 
+import { logout } from '@/redux/slices/auth/authSlice';
+import { AppDispatch, RootState } from '@/redux/store';
+import { AuthResponse, AuthState } from '@/types/type';
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Header() {
-    const [isSticky, setIsSticky] = useState(false)
-    const [lastScrollY, setLastScrollY] = useState(0)
+    const [isSticky, setIsSticky] = useState(false);
+    const [lastScrollY, setLastScrollY] = useState(0);
+    const dispatch = useDispatch<AppDispatch>();
+    const user = useSelector((state: RootState) => state.auth.user as AuthResponse | null);
+    console.log("Header user →", user);
+
+
+    const handleLogout = () => {
+        dispatch(logout())
+    }
 
     useEffect(() => {
         const handleScroll = () => {
@@ -43,19 +55,35 @@ export default function Header() {
                     </Link>
                 </div>
                 {/* Auth Buttons */}
-                <div className="flex gap-2">
-                    <Link
-                        href="/login"
-                        className="px-4 py-2 rounded-md border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition"
-                    >
-                        Login
-                    </Link>
-                    <Link
-                        href="/register"
-                        className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-                    >
-                        Register
-                    </Link>
+                <div className="flex items-center gap-2">
+                    {user ? (
+                        <>
+                            <span className="text-gray-700 font-medium">
+                                Hi, {user.name}
+                            </span>
+                            <button
+                                onClick={handleLogout}
+                                className="px-4 py-2 rounded-md border border-red-600 text-red-600 font-semibold hover:bg-red-50 transition"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link
+                                href="/login"
+                                className="px-4 py-2 rounded-md border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition"
+                            >
+                                Login
+                            </Link>
+                            <Link
+                                href="/register"
+                                className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                            >
+                                Register
+                            </Link>
+                        </>
+                    )}
                 </div>
                 {/* Mobile Menu Button */}
                 <div className="md:hidden">

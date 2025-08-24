@@ -1,12 +1,24 @@
 'use client'
 
+import { loginUser } from '@/redux/actions/auth/authActions'
+import { AppDispatch } from '@/redux/store'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+import toast from 'react-hot-toast'
 import { BiLeftArrowAlt } from 'react-icons/bi'
+import { useDispatch } from 'react-redux'
+
+const initialState = {
+  email: '',
+  password: ''
+}
 
 export default function Login() {
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState(initialState)
   const [error, setError] = useState('')
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -19,8 +31,19 @@ export default function Login() {
       setError('Please enter both email and password')
       return
     }
-    // Add your login logic here
-    alert('Logged in!\n' + JSON.stringify(form, null, 2))
+
+    dispatch(loginUser(form))
+      .unwrap()
+      .then(() => {
+        toast.success("Login successful!");
+        setTimeout(() => {
+          router.push("/");
+        }, 1000);
+      })
+      .catch((err) => {
+        toast.error(err.message || "Login failed");
+      });
+    ;
   }
 
   return (

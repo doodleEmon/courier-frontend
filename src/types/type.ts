@@ -50,15 +50,6 @@ export interface Parcel {
     updatedAt: string;
 }
 
-// Auth Types
-export interface AuthState {
-    user: User | null;
-    token: string | null;
-    isAuthenticated: boolean;
-    loading: boolean;
-    error: string | null;
-}
-
 export interface LoginCredentials {
     email: string;
     password: string;
@@ -69,10 +60,16 @@ export interface RegisterData {
     email: string;
     phone: string;
     password: string;
-    role?: 'Customer' | 'Agent' | 'Admin';
     dateOfBirth?: string;
+    role?: 'Customer' | 'Agent' | 'Admin';
     gender?: 'male' | 'female' | 'other';
     avatar: string;
+}
+
+export interface AuthState {
+    user: AuthResponse | null;
+    loading: boolean;
+    error: any;
 }
 
 // API Response Types
@@ -81,7 +78,9 @@ export interface AuthResponse {
     name: string;
     email: string;
     phone: string;
-    role: string;
+    dateOfBirth?: string;
+    role?: 'Customer' | 'Agent' | 'Admin';
+    gender?: 'male' | 'female' | 'other';
     token: string;
 }
 

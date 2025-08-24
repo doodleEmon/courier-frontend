@@ -1,17 +1,9 @@
 import { loginUser, registerUser } from '@/redux/actions/auth/authActions';
-import { User } from '@/types/type';
+import { AuthResponse, AuthState } from '@/types/type';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface AuthState {
-    user: User | null;
-    token: string | null;
-    loading: boolean;
-    error: any;
-}
 
 const initialState: AuthState = {
     user: null,
-    token: null,
     loading: false,
     error: null,
 };
@@ -20,16 +12,14 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<{ user: User; token: string }>) => {
-            state.user = action.payload.user;
-            state.token = action.payload.token;
+        setUser: (state, action: PayloadAction<AuthResponse>) => {
+             console.log("Hydrating user →", action.payload);
+            state.user = action.payload;
         },
         logout: (state) => {
             state.user = null;
-            state.token = null;
-            state.loading = false;
-            state.error = null;
-        },
+            localStorage.removeItem("user");
+        }
     },
     // Use extraReducers to handle actions from createAsyncThunk
     extraReducers: (builder) => {
@@ -41,10 +31,8 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload.user;
-                state.token = action.payload.token;
-
-                localStorage.setItem('token', action.payload.token)
+                state.user = action.payload;
+                localStorage.setItem("user", JSON.stringify(action.payload));
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -57,15 +45,12 @@ const authSlice = createSlice({
             })
             .addCase(registerUser.fulfilled, (state, action) => {
                 console.log(action.payload);
-                state.loading = false;
                 state.user = action.payload;
-                state.token = action.payload.token;
-
-                localStorage.setItem('token', action.payload.token)
+                localStorage.setItem("user", JSON.stringify(action.payload));
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload as string;
             });
     },
 });
