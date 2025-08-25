@@ -5,19 +5,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchCustomerParcels } from "@/redux/actions/parcel/parcelActions";
 import { Parcel } from "@/types/type";
-import { TbDetails, TbListDetails } from "react-icons/tb";
-import { CgDetailsMore } from "react-icons/cg";
-import { MdDetails } from "react-icons/md";
+import { TbListDetails } from "react-icons/tb";
 import { BiEdit, BiTrash } from "react-icons/bi";
-import { FaDeleteLeft } from "react-icons/fa6";
-import { FiDelete } from "react-icons/fi";
-import { FcDeleteDatabase } from "react-icons/fc";
+import toast from "react-hot-toast";
 
 export default function MyBookings() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number } | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedParcel, setSelectedParcel] = useState<Parcel | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<Parcel> | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
   const { parcels, loading, error } = useSelector((state: RootState) => state.parcel);
@@ -41,12 +39,6 @@ export default function MyBookings() {
 
   if (loading) return <p>Loading parcels...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-
-  const handleEdit = (parcel: Parcel) => {
-    // Your edit logic here
-    console.log('Edit parcel:', parcel);
-    setActiveDropdown(null);
-  };
 
   const handleCancel = (parcelId: string | null) => {
     // Your cancel logic here
@@ -77,6 +69,25 @@ export default function MyBookings() {
       });
       setActiveDropdown(parcelId);
     }
+  };
+
+  const handleEdit = (parcel: Parcel) => {
+    setEditForm(parcel);
+    setShowEditModal(true);
+    setActiveDropdown(null);
+    setShowModal(false);
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Dispatch update action here
+    // dispatch(updateParcel(editForm))
+    toast.success("Booking updated!");
+    setShowEditModal(false);
   };
 
   return (
@@ -180,8 +191,140 @@ export default function MyBookings() {
         </div>
       )}
 
-      {/* Modal for Details */}
+      {/* Edit Modal */}
+      {showEditModal && editForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden transform transition-all">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white relative">
+              <h3 className="text-xl font-bold">Edit Booking</h3>
+              <button
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all duration-200 hover:rotate-90 cursor-pointer"
+                onClick={() => setShowEditModal(false)}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {/* Form */}
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-4 max-h-[calc(90vh-100px)] overflow-y-auto">
+              <div>
+                <label className="block text-sm font-medium">Recipient Name</label>
+                <input
+                  type="text"
+                  name="recipientName"
+                  value={editForm.recipientName || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Recipient Phone</label>
+                <input
+                  type="text"
+                  name="recipientPhone"
+                  value={editForm.recipientPhone || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Pickup Address</label>
+                <input
+                  type="text"
+                  name="pickupAddress"
+                  value={editForm.pickupAddress || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Delivery Address</label>
+                <input
+                  type="text"
+                  name="deliveryAddress"
+                  value={editForm.deliveryAddress || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Parcel Type</label>
+                <input
+                  type="text"
+                  name="parcelType"
+                  value={editForm.parcelType || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Size</label>
+                <select
+                  name="parcelSize"
+                  value={editForm.parcelSize || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                >
+                  <option value="">Select size</option>
+                  <option value="Small">Small (0.5 - 1 kg)</option>
+                  <option value="Medium">Medium (2 - 3 kg)</option>
+                  <option value="Large">Large (4 - more)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Payment Type</label>
+                <select
+                  name="paymentType"
+                  value={editForm.paymentType || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                >
+                  <option value="">Select payment</option>
+                  <option value="COD">Cash on Delivery</option>
+                  <option value="Prepaid">Prepaid</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Description</label>
+                <input
+                  type="text"
+                  name="description"
+                  value={editForm.description || ""}
+                  onChange={handleEditChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  className="px-5 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition cursor-pointer"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition font-semibold cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
+      {/* Modal for Details */}
       {showModal && selectedParcel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden transform transition-all">
@@ -321,7 +464,6 @@ export default function MyBookings() {
 
             {/* Actions */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
-
               <button
                 className="px-6 py-2.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 flex items-center gap-2 shadow-sm cursor-pointer"
                 onClick={() => handleEdit(selectedParcel)}
