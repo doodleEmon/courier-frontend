@@ -13,7 +13,6 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         setUser: (state, action: PayloadAction<AuthResponse>) => {
-             console.log("Hydrating user →", action.payload);
             state.user = action.payload;
         },
         logout: (state) => {

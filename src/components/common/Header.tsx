@@ -12,8 +12,6 @@ export default function Header() {
     const [lastScrollY, setLastScrollY] = useState(0);
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user as AuthResponse | null);
-    console.log("Header user →", user);
-
 
     const handleLogout = () => {
         dispatch(logout())
