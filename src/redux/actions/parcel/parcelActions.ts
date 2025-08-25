@@ -65,8 +65,8 @@ export const fetchCustomerParcels = createAsyncThunk(
 
 // ✅ Thunk: Edit a booking parcel
 export const updateParcel = createAsyncThunk(
-    "parcel/update",
-    async ({ id, updates }: { id: string; updates: Partial<Parcel>}, { rejectWithValue }) => {
+    "parcel/editParcel",
+    async ({ id, updates }: { id: string; updates: Partial<Parcel> }, { rejectWithValue }) => {
         let token;
         const user = localStorage.getItem("user");
         if (user) {
@@ -94,15 +94,26 @@ export const updateParcel = createAsyncThunk(
     }
 );
 
-// ✅ Update parcel (edit booking)
-// export const updateParcel = createAsyncThunk(
-//   "parcels/updateParcel",
-//   async ({ id, updates }: { id: string; updates: Partial<Parcel> }, thunkAPI) => {
-//     try {
-//       const res = await axios.put(`/api/parcels/${id}`, updates);
-//       return res.data;
-//     } catch (err: any) {
-//       return thunkAPI.rejectWithValue(err.response?.data?.message || "Failed to update parcel");
-//     }
-//   }
-// );
+// ✅ Cancel booking
+export const cancelParcel = createAsyncThunk(
+    "parcels/cancelParcel",
+    async (id: string, thunkAPI) => {
+        let token;
+        const user = localStorage.getItem("user");
+        if (user) {
+            token = JSON.parse(user).token;
+        }
+        try {
+            const res = await fetch(`${BASE_URL}/parcel/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return id;
+        } catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response?.data?.message || "Cancel failed");
+        }
+    }
+);

@@ -133,9 +133,10 @@ export interface ProtectedRouteProps {
     allowedRoles?: User['role'][];
 }
 
-export interface ModalProps {
+export interface ConfirmModalProps {
     isOpen: boolean;
-    onClose: () => void;
-    children: React.ReactNode;
     title?: string;
+    description?: string;
+    onConfirm: () => void;
+    onCancel: () => void;
 }

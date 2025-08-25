@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
+import { cancelParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
 import { Parcel } from "@/types/type";
 import { TbListDetails } from "react-icons/tb";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function MyBookings() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -17,6 +18,8 @@ export default function MyBookings() {
   const [selectedParcel, setSelectedParcel] = useState<Parcel | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Parcel> | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
   const { parcels, loading, error } = useSelector((state: RootState) => state.parcel);
@@ -43,9 +46,45 @@ export default function MyBookings() {
   if (loading) return <p>Loading parcels...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
+  const openCancelModal = (parcelId: string) => {
+    setSelectedParcelId(parcelId);
+    setIsModalOpen(true);
+  };
+
+  const handleCancelConfirm = () => {
+    if (!selectedParcelId) return;
+
+    dispatch(cancelParcel(selectedParcelId))
+      .unwrap()
+      .then(() => {
+        toast.success("Parcel successfully cancelled!");
+        setTimeout(() => {
+          router.push("/my-bookings");
+        }, 1000);
+      })
+      .catch((err) => {
+        toast.error(err.message || "Parcel cancellation failed");
+      })
+      .finally(() => {
+        setIsModalOpen(false);
+        setSelectedParcelId(null);
+      });
+  };
+
   const handleCancel = (parcelId: string | null) => {
-    // Your cancel logic here
-    console.log('Cancel parcel:', parcelId);
+    if (parcelId && confirm("Are you sure you want to cancel this booking?")) {
+      dispatch(cancelParcel(parcelId))
+        .unwrap()
+        .then(() => {
+          toast.success("Parcel successfully cancelled!");
+          setTimeout(() => {
+            router.push("/my-bookings");
+          }, 1000);
+        })
+        .catch((err) => {
+          toast.error(err.message || "Parcel cancellation failed");
+        });
+    }
     setActiveDropdown(null);
   };
 
@@ -201,7 +240,7 @@ export default function MyBookings() {
           </button>
           <button
             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-100 cursor-pointer"
-            onClick={() => handleCancel(activeDropdown)}
+            onClick={() => openCancelModal(activeDropdown)}
           >
             <span className="flex items-center gap-x-2"><BiTrash /> Cancel Booking</span>
           </button>
@@ -493,7 +532,7 @@ export default function MyBookings() {
 
               <button
                 className="px-6 py-2.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 hover:border-red-300 transition-all duration-200 flex items-center gap-2 shadow-sm cursor-pointer"
-                onClick={() => handleCancel(selectedParcel._id)}
+                onClick={() => openCancelModal(selectedParcel._id)}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -504,6 +543,13 @@ export default function MyBookings() {
           </div>
         </div>
       )}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        title="Cancel this booking?"
+        description="This action cannot be undone. The parcel will be marked as cancelled."
+        onConfirm={handleCancelConfirm}
+        onCancel={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

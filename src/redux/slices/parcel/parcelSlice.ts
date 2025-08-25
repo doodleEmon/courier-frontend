@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
+import { cancelParcel, createParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
 import { ParcelState } from "@/types/type";
 
 const initialState: ParcelState = {
@@ -39,16 +39,16 @@ const parcelSlice = createSlice({
             state.error = action.payload as string;
         })
 
-            // Update
-            .addCase(updateParcel.fulfilled, (state, action) => {
-                const idx = state.parcels.findIndex((p) => p._id === action.payload._id);
-                if (idx !== -1) state.parcels[idx] = action.payload;
-            });
+        // Edit Customer Parcels
+        builder.addCase(updateParcel.fulfilled, (state, action) => {
+            const idx = state.parcels.findIndex((p) => p._id === action.payload._id);
+            if (idx !== -1) state.parcels[idx] = action.payload;
+        })
 
-        //   // Cancel
-        //   .addCase(cancelParcel.fulfilled, (state, action) => {
-        //     state.parcels = state.parcels.filter((p) => p._id !== action.payload);
-        //   });
+        // Delete Customer Parcels
+        builder.addCase(cancelParcel.fulfilled, (state, action) => {
+            state.parcels = state.parcels.filter((p) => p._id !== action.payload);
+        });
     },
 });
 

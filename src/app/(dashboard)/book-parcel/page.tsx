@@ -1,6 +1,5 @@
 "use client";
 
-import { BASE_URL } from "@/constants";
 import { createParcel } from "@/redux/actions/parcel/parcelActions";
 import { AppDispatch } from "@/redux/store";
 import { useRouter } from "next/navigation";
