@@ -35,7 +35,7 @@ export default function RootLayout({
         <ReduxProvider>
           <Header />
           {children}
-          <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 5000 }} />
+          <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 3000 }} />
           <Footer />
         </ReduxProvider>
       </body>

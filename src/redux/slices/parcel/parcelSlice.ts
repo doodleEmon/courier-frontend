@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createParcel } from "@/redux/actions/parcel/parcelActions";
+import { createParcel, fetchCustomerParcels } from "@/redux/actions/parcel/parcelActions";
 import { ParcelState } from "@/types/type";
 
 const initialState: ParcelState = {
@@ -27,17 +27,17 @@ const parcelSlice = createSlice({
     });
 
     // Fetch Customer Parcels
-    // builder.addCase(fetchCustomerParcels.pending, (state) => {
-    //   state.loading = true;
-    // });
-    // builder.addCase(fetchCustomerParcels.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   state.parcels = action.payload;
-    // });
-    // builder.addCase(fetchCustomerParcels.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.payload as string;
-    // });
+    builder.addCase(fetchCustomerParcels.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(fetchCustomerParcels.fulfilled, (state, action) => {
+      state.loading = false;
+      state.parcels = action.payload;
+    });
+    builder.addCase(fetchCustomerParcels.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
   },
 });
 

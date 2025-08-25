@@ -37,7 +37,7 @@ export default function DashboardLayout({
                     <CustomLayout>
                         {children}
                     </CustomLayout>
-                    <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 5000 }} />
+                    <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 3000 }} />
                 </ReduxProvider>
             </body>
         </html>
