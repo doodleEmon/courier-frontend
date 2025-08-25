@@ -8,8 +8,8 @@ const initialState: ParcelState = {
     error: null,
 };
 
-const parcelSlice = createSlice({
-    name: "parcel",
+const customerSlice = createSlice({
+    name: "customer",
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -52,4 +52,4 @@ const parcelSlice = createSlice({
     },
 });
 
-export default parcelSlice.reducer;
+export default customerSlice.reducer;

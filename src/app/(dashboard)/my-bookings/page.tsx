@@ -22,7 +22,7 @@ export default function MyBookings() {
   const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { parcels, loading, error } = useSelector((state: RootState) => state.parcel);
+  const { parcels, loading, error } = useSelector((state: RootState) => state.customer);
 
   const router = useRouter();
 

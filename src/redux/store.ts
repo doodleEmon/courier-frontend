@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import usersReducer from '@/redux/slices/auth/authSlice'
-import parcelReducer from "@/redux/slices/parcel/parcelSlice"
+import customerReducer from "@/redux/slices/customer/customerSlice"
 
 export const store = configureStore({
     reducer: {
         auth: usersReducer,
-        parcel: parcelReducer
+        customer: customerReducer
     },
 })
 
