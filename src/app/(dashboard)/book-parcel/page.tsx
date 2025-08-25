@@ -14,6 +14,9 @@ const initialState = {
     parcelType: "",
     parcelSize: "",
     paymentType: "",
+    recipientName: "",
+    recipientPhone: "",
+    description: ""
 }
 
 export default function BookParcel() {
@@ -50,6 +53,30 @@ export default function BookParcel() {
             <h1 className="text-2xl font-semibold mb-4">Book a Parcel</h1>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium">Recipient Name</label>
+                    <input
+                        type="text"
+                        name="recipientName"
+                        value={form.recipientName}
+                        onChange={handleChange}
+                        className="w-full border rounded px-3 py-2"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium">Recipient Phone</label>
+                    <input
+                        type="text"
+                        name="recipientPhone"
+                        value={form.recipientPhone}
+                        onChange={handleChange}
+                        className="w-full border rounded px-3 py-2"
+                        required
+                    />
+                </div>
+
                 <div>
                     <label className="block text-sm font-medium">Pickup Address</label>
                     <input
@@ -114,6 +141,18 @@ export default function BookParcel() {
                         <option value="COD">Cash on Delivery</option>
                         <option value="Prepaid">Prepaid</option>
                     </select>
+                </div>
+                
+                <div>
+                    <label className="block text-sm font-medium">Description</label>
+                    <input
+                        type="text"
+                        name="description"
+                        value={form.description}
+                        onChange={handleChange}
+                        className="w-full border rounded px-3 py-2"
+                        required
+                    />
                 </div>
 
                 <button

@@ -4,7 +4,11 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 // ✅ Thunk: Create a new parcel
 export const createParcel = createAsyncThunk(
     "parcel/create",
-    async (parcelData: { pickupAddress: string, deliveryAddress: string, parcelType: string, parcelSize: string, paymentType: string }, { rejectWithValue }) => {
+    async (parcelData: {
+        pickupAddress: string, deliveryAddress: string, parcelType: string, parcelSize: string, paymentType: string, recipientName: string,
+        recipientPhone: string,
+        description: string
+    }, { rejectWithValue }) => {
 
         let token;
         const user = localStorage.getItem("user");
@@ -54,6 +58,41 @@ export const fetchCustomerParcels = createAsyncThunk(
             return data;
         } catch (err: any) {
             return rejectWithValue(err.response?.data?.message || "Failed to fetch parcels");
+        }
+    }
+);
+
+// ✅ Thunk: Edit a parcel
+export const editParcel = createAsyncThunk(
+    "parcel/edit",
+    async (parcelData: {
+        pickupAddress: string, deliveryAddress: string, parcelType: string, parcelSize: string, paymentType: string, recipientName: string,
+        recipientPhone: string, description: string
+    }, { rejectWithValue }) => {
+
+        let token;
+        const user = localStorage.getItem("user");
+        if (user) {
+            token = JSON.parse(user).token;
+        }
+        try {
+            const response = await fetch(`${BASE_URL}/parcel`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(parcelData),
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || `HTTP error! status: ${response.status}`);
+            }
+
+            return data;
+        } catch (err: any) {
+            return rejectWithValue(err.message || "Something went wrong");
         }
     }
 );

@@ -36,7 +36,7 @@ export default function CustomLayout({
     return (
         <div className="flex min-h-screen">
             {/* Sidebar */}
-            <aside className="w-64 h-auto bg-blue-600 text-white p-5">
+            <aside className="w-64 h-auto bg-gradient-to-b from-blue-600 to-purple-600 text-white p-5">
                 <nav className="flex flex-col gap-3">
                     {navigation.map((item) => {
                         const Icon = item.icon;

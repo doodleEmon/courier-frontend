@@ -21,12 +21,15 @@ export interface Parcel {
     _id: string;
     customerId: string;
     agentId: string;
+    recipientName: string;
+    recipientPhone: string;
     pickupAddress: string;
     deliveryAddress: string;
     parcelSize: string;
     parcelType: string;
     paymentType: 'COD' | 'Prepaid';
     status: 'Pending' | 'Picked Up' | 'In Transit' | 'Delivered' | 'Failed';
+    description: string;
     currentLocation: Location;
     trackingNumber?: string;
     qrCode?: string;
