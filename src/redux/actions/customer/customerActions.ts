@@ -17,7 +17,7 @@ export const createParcel = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/parcel`, {
+            const response = await fetch(`${BASE_URL}/customer/parcels/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export const fetchCustomerParcels = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/parcel/customer`, {
+            const response = await fetch(`${BASE_URL}/customer/parcels`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ export const updateParcel = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/parcel/${id}`, {
+            const response = await fetch(`${BASE_URL}/customer/parcels/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ export const cancelParcel = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const res = await fetch(`${BASE_URL}/parcel/${id}`, {
+            const res = await fetch(`${BASE_URL}/customer/parcels/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

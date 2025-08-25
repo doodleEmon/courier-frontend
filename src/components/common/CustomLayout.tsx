@@ -1,5 +1,4 @@
 "use client"
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
@@ -34,22 +33,25 @@ export default function CustomLayout({
     };
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex h-full">
             {/* Sidebar */}
-            <aside className="w-64 h-auto bg-gradient-to-b from-blue-600 to-purple-600 text-white p-5">
-                <nav className="flex flex-col gap-3">
+            <aside className="w-64 bg-gradient-to-b from-blue-600 to-purple-600 text-white p-5 flex-shrink-0">
+                <nav className="flex flex-col gap-2">
                     {navigation.map((item) => {
                         const Icon = item.icon;
                         const active = isActive(item.href);
                         const extraPadding = item.href === '/tracking' ? 'px-[10px]' : 'px-3';
-
                         return (
                             <Link
                                 key={item.href}
-                                className={`flex items-center ${extraPadding} py-1 rounded gap-x-2 ${active ? 'bg-white text-blue-600' : 'hover:bg-blue-500'}`}
+                                className={`flex items-center ${extraPadding} py-2 rounded-lg gap-x-3 transition-all duration-200 ${active
+                                        ? 'bg-white text-blue-600 shadow-md'
+                                        : 'hover:bg-blue-500 hover:bg-opacity-50'
+                                    }`}
                                 href={item.href}
                             >
-                                <Icon size={item.href === '/tracking' ? 24 : 20} /> {item.label}
+                                <Icon size={item.href === '/tracking' ? 24 : 20} />
+                                <span className="font-medium">{item.label}</span>
                             </Link>
                         );
                     })}
@@ -57,8 +59,8 @@ export default function CustomLayout({
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 bg-gray-100">
-                <div className='p-6'>
+            <main className="flex-1 bg-gray-100 overflow-auto">
+                <div className="h-full p-6">
                     {children}
                 </div>
                 {/* <Footer /> */}

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
-import Footer from "@/components/common/Footer";
 import Header from "@/components/common/Header";
 import ReduxProvider from "@/redux/ReduxProvider";
 import { Toaster } from "react-hot-toast";
@@ -33,10 +32,14 @@ export default function DashboardLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <ReduxProvider>
-                    <Header />
-                    <CustomLayout>
-                        {children}
-                    </CustomLayout>
+                    <div className="h-screen flex flex-col">
+                        <Header />
+                        <div className="flex-1 overflow-hidden">
+                            <CustomLayout>
+                                {children}
+                            </CustomLayout>
+                        </div>
+                    </div>
                     <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 3000 }} />
                 </ReduxProvider>
             </body>
