@@ -41,7 +41,7 @@ export default function BookParcel() {
                 toast.success("Parcel booking successful!");
                 setTimeout(() => {
                     router.push("/my-bookings");
-                }, 1500);
+                }, 1000);
             })
             .catch((err) => {
                 toast.error(err.message || "Parcel booking failed");

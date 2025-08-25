@@ -70,7 +70,7 @@ export default function Register() {
                     toast.success("Registration successful!");
                     setTimeout(() => {
                         router.push("/dashboard");
-                    }, 1500);
+                    }, 1000);
                 })
                 .catch((err) => {
                     toast.error(err.message || "Registration failed");

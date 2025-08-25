@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchCustomerParcels } from "@/redux/actions/parcel/parcelActions";
+import { fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
 import { Parcel } from "@/types/type";
 import { TbListDetails } from "react-icons/tb";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function MyBookings() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -19,6 +20,8 @@ export default function MyBookings() {
 
   const dispatch = useDispatch<AppDispatch>();
   const { parcels, loading, error } = useSelector((state: RootState) => state.parcel);
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -84,10 +87,24 @@ export default function MyBookings() {
 
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Dispatch update action here
-    // dispatch(updateParcel(editForm))
-    toast.success("Booking updated!");
-    setShowEditModal(false);
+
+    if (editForm && editForm._id) {
+      const { _id, ...updates } = editForm;
+      // dispatch(updateParcel({ id: _id, updates }));
+      // toast.success("Booking updated!");
+      dispatch(updateParcel({ id: _id, updates }))
+        .unwrap()
+        .then(() => {
+          toast.success("Parcel booking info updated!");
+          setTimeout(() => {
+            router.push("/my-bookings");
+          }, 1000);
+        })
+        .catch((err) => {
+          toast.error(err.message || "Parcel booking info update failed");
+        });
+      setShowEditModal(false);
+    }
   };
 
   return (

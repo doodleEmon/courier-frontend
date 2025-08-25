@@ -1,4 +1,5 @@
 import { BASE_URL } from "@/constants";
+import { Parcel } from "@/types/type";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // ✅ Thunk: Create a new parcel
@@ -62,27 +63,23 @@ export const fetchCustomerParcels = createAsyncThunk(
     }
 );
 
-// ✅ Thunk: Edit a parcel
-export const editParcel = createAsyncThunk(
-    "parcel/edit",
-    async (parcelData: {
-        pickupAddress: string, deliveryAddress: string, parcelType: string, parcelSize: string, paymentType: string, recipientName: string,
-        recipientPhone: string, description: string
-    }, { rejectWithValue }) => {
-
+// ✅ Thunk: Edit a booking parcel
+export const updateParcel = createAsyncThunk(
+    "parcel/update",
+    async ({ id, updates }: { id: string; updates: Partial<Parcel>}, { rejectWithValue }) => {
         let token;
         const user = localStorage.getItem("user");
         if (user) {
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/parcel`, {
+            const response = await fetch(`${BASE_URL}/parcel/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify(parcelData),
+                body: JSON.stringify(updates),
             });
             const data = await response.json();
 
@@ -96,3 +93,16 @@ export const editParcel = createAsyncThunk(
         }
     }
 );
+
+// ✅ Update parcel (edit booking)
+// export const updateParcel = createAsyncThunk(
+//   "parcels/updateParcel",
+//   async ({ id, updates }: { id: string; updates: Partial<Parcel> }, thunkAPI) => {
+//     try {
+//       const res = await axios.put(`/api/parcels/${id}`, updates);
+//       return res.data;
+//     } catch (err: any) {
+//       return thunkAPI.rejectWithValue(err.response?.data?.message || "Failed to update parcel");
+//     }
+//   }
+// );

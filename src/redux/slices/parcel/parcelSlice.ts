@@ -1,44 +1,55 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createParcel, fetchCustomerParcels } from "@/redux/actions/parcel/parcelActions";
+import { createParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
 import { ParcelState } from "@/types/type";
 
 const initialState: ParcelState = {
-  parcels: [],
-  loading: false,
-  error: null,
+    parcels: [],
+    loading: false,
+    error: null,
 };
 
 const parcelSlice = createSlice({
-  name: "parcel",
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    // Create Parcel
-    builder.addCase(createParcel.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(createParcel.fulfilled, (state, action) => {
-      state.loading = false;
-      state.parcels.push(action.payload);
-    });
-    builder.addCase(createParcel.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
+    name: "parcel",
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        // Create Parcel
+        builder.addCase(createParcel.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(createParcel.fulfilled, (state, action) => {
+            state.loading = false;
+            state.parcels.push(action.payload);
+        })
+        builder.addCase(createParcel.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
 
-    // Fetch Customer Parcels
-    builder.addCase(fetchCustomerParcels.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(fetchCustomerParcels.fulfilled, (state, action) => {
-      state.loading = false;
-      state.parcels = action.payload;
-    });
-    builder.addCase(fetchCustomerParcels.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
-  },
+        // Fetch Customer Parcels
+        builder.addCase(fetchCustomerParcels.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(fetchCustomerParcels.fulfilled, (state, action) => {
+            state.loading = false;
+            state.parcels = action.payload;
+        })
+        builder.addCase(fetchCustomerParcels.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+
+            // Update
+            .addCase(updateParcel.fulfilled, (state, action) => {
+                const idx = state.parcels.findIndex((p) => p._id === action.payload._id);
+                if (idx !== -1) state.parcels[idx] = action.payload;
+            });
+
+        //   // Cancel
+        //   .addCase(cancelParcel.fulfilled, (state, action) => {
+        //     state.parcels = state.parcels.filter((p) => p._id !== action.payload);
+        //   });
+    },
 });
 
 export default parcelSlice.reducer;
