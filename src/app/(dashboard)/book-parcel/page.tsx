@@ -1,6 +1,6 @@
 "use client";
 
-import { createParcel } from "@/redux/actions/parcel/parcelActions";
+import { createParcel } from "@/redux/actions/customer/customerActions";
 import { AppDispatch } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

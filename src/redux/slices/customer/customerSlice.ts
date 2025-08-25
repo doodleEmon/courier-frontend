@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { cancelParcel, createParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
+import { cancelParcel, createParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/customer/customerActions";
 import { ParcelState } from "@/types/type";
 
 const initialState: ParcelState = {

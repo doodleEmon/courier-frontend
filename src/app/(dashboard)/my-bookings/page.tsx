@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { cancelParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/parcel/parcelActions";
+import { cancelParcel, fetchCustomerParcels, updateParcel } from "@/redux/actions/customer/customerActions";
 import { Parcel } from "@/types/type";
 import { TbListDetails } from "react-icons/tb";
 import { BiEdit, BiTrash } from "react-icons/bi";
