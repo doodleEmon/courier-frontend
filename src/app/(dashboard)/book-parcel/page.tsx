@@ -1,19 +1,28 @@
 "use client";
 
 import { BASE_URL } from "@/constants";
+import { createParcel } from "@/redux/actions/parcel/parcelActions";
+import { AppDispatch } from "@/redux/store";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+
+const initialState = {
+    pickupAddress: "",
+    deliveryAddress: "",
+    parcelType: "",
+    parcelSize: "",
+    paymentType: "",
+}
 
 export default function BookParcel() {
-    const [form, setForm] = useState({
-        pickupAddress: "",
-        deliveryAddress: "",
-        parcelType: "",
-        size: "",
-        paymentType: "COD",
-    });
-
+    const [form, setForm] = useState(initialState);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
+
+    const dispatch = useDispatch<AppDispatch>();
+    const router = useRouter();
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,41 +31,23 @@ export default function BookParcel() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setMessage("");
 
-        try {
-            const res = await fetch(`/${BASE_URL}/parcel`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("user")}`,
-                },
-                body: JSON.stringify(form),
+        dispatch(createParcel(form))
+            .unwrap()
+            .then(() => {
+                toast.success("Parcel booking successful!");
+                setTimeout(() => {
+                    router.push("/my-bookings");
+                }, 1500);
+            })
+            .catch((err) => {
+                toast.error(err.message || "Parcel booking failed");
             });
-
-            if (!res.ok) throw new Error("Booking failed");
-            const data = await res.json();
-
-            setMessage("✅ Parcel booked successfully!");
-            setForm({
-                pickupAddress: "",
-                deliveryAddress: "",
-                parcelType: "",
-                size: "",
-                paymentType: "COD",
-            });
-        } catch (error: any) {
-            setMessage("❌ " + error.message);
-        } finally {
-            setLoading(false);
-        }
     };
 
     return (
         <div className="max-w-xl mx-auto p-6 bg-white shadow rounded-lg">
             <h1 className="text-2xl font-semibold mb-4">Book a Parcel</h1>
-
-            {message && <p className="mb-4 text-sm">{message}</p>}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -99,16 +90,16 @@ export default function BookParcel() {
                 <div>
                     <label className="block text-sm font-medium">Size</label>
                     <select
-                        name="size"
-                        value={form.size}
+                        name="parcelSize"
+                        value={form.parcelSize}
                         onChange={handleChange}
                         className="w-full border rounded px-3 py-2"
                         required
                     >
                         <option value="">Select size</option>
-                        <option value="Small">Small</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Large">Large</option>
+                        <option value="Small">Small (0.5 - 1 kg)</option>
+                        <option value="Medium">Medium (2 - 3 kg)</option>
+                        <option value="Large">Large (4 - more)</option>
                     </select>
                 </div>
 
@@ -128,7 +119,7 @@ export default function BookParcel() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 cursor-pointer"
                 >
                     {loading ? "Booking..." : "Book Parcel"}
                 </button>

@@ -11,23 +11,6 @@ export interface User {
     createdAt: string;
     updatedAt: string;
 }
-
-// Address Type
-export interface Address {
-    house: string;
-    street: string;
-    area: string;
-    city: string;
-    district: string;
-    division: string;
-    postalCode?: string;
-    coordinates?: {
-        latitude: number;
-        longitude: number;
-    };
-}
-
-// Location Type
 export interface Location {
     latitude: number;
     longitude: number;
@@ -36,11 +19,12 @@ export interface Location {
 // Parcel Types
 export interface Parcel {
     _id: string;
-    customerId: string | User;
-    agentId?: string | User;
-    pickupAddress: Address;
-    deliveryAddress: Address;
+    customerId: string;
+    agentId: string;
+    pickupAddress: string;
+    deliveryAddress: string;
     parcelSize: string;
+    parcelType: string;
     paymentType: 'COD' | 'Prepaid';
     status: 'Pending' | 'Picked Up' | 'In Transit' | 'Delivered' | 'Failed';
     currentLocation: Location;
@@ -48,6 +32,12 @@ export interface Parcel {
     qrCode?: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface ParcelState {
+    parcels: Parcel[];
+    loading: boolean;
+    error: string | null;
 }
 
 export interface LoginCredentials {
@@ -89,13 +79,20 @@ export interface ApiError {
     status?: number;
 }
 
-// Form Types
-export interface ParcelFormData {
-    pickupAddress: Address;
-    deliveryAddress: Address;
-    parcelSize: string;
+export interface CreateParcel {
+    pickupAddress: string;
+    deliveryAddress: string;
+    parcelSize: 'Small' | 'Medium' | 'Large';
+    parcelType: string;
     paymentType: 'COD' | 'Prepaid';
-    codAmount?: number;
+}
+
+export interface ParcelFormData {
+    pickupAddress: string;
+    deliveryAddress: string;
+    parcelSize: string;
+    parcelType: string;
+    paymentType: 'COD' | 'Prepaid';
 }
 
 export interface StatusUpdateData {
@@ -139,35 +136,3 @@ export interface ModalProps {
     children: React.ReactNode;
     title?: string;
 }
-
-export interface TableColumn<T> {
-    key: keyof T | string;
-    label: string;
-    render?: (item: T) => React.ReactNode;
-    sortable?: boolean;
-}
-
-// Utility Types
-export type ParcelStatus = Parcel['status'];
-export type UserRole = User['role'];
-export type PaymentType = Parcel['paymentType'];
-
-// Form Validation Types
-export interface FieldError {
-    type: string;
-    message: string;
-}
-
-export interface FormErrors {
-    [key: string]: FieldError | undefined;
-}
-
-// Constants Types
-export const PARCEL_SIZES = ['Small', 'Medium', 'Large', 'Extra Large'] as const;
-export const BANGLADESH_DIVISIONS = [
-    'Dhaka', 'Chittagong', 'Rajshahi', 'Khulna',
-    'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh'
-] as const;
-
-export type ParcelSize = typeof PARCEL_SIZES[number];
-export type BangladeshDivision = typeof BANGLADESH_DIVISIONS[number];
