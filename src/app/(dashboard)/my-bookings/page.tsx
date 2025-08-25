@@ -71,23 +71,6 @@ export default function MyBookings() {
       });
   };
 
-  const handleCancel = (parcelId: string | null) => {
-    if (parcelId && confirm("Are you sure you want to cancel this booking?")) {
-      dispatch(cancelParcel(parcelId))
-        .unwrap()
-        .then(() => {
-          toast.success("Parcel successfully cancelled!");
-          setTimeout(() => {
-            router.push("/my-bookings");
-          }, 1000);
-        })
-        .catch((err) => {
-          toast.error(err.message || "Parcel cancellation failed");
-        });
-    }
-    setActiveDropdown(null);
-  };
-
   const handleDetails = (parcel: Parcel) => {
     setSelectedParcel(parcel);
     setShowModal(true);
