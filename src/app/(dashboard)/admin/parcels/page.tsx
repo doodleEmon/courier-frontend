@@ -1,24 +1,23 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { fetchAdminParcels, assignAgent, updateParcelStatus, fetchAdminUsers } from "@/redux/actions/admin/adminActions";
-import { Parcel } from "@/types/type";
-import toast from "react-hot-toast";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
+import { fetchAdminParcels, assignAgent, updateParcelStatus, fetchAdminUsers } from '@/redux/actions/admin/adminActions';
+import { Parcel, User } from '@/types/type';
+import toast from 'react-hot-toast';
 
 export default function AdminParcels() {
     const dispatch = useDispatch<AppDispatch>();
     const { parcels, loading, error } = useSelector((state: RootState) => state.admin);
-    const { users } = useSelector((state: RootState) => state.admin); // Assuming users are fetched elsewhere or fetch them here
+    const { users } = useSelector((state: RootState) => state.admin);
 
-    const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
     const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
-    const [selectedStatus, setSelectedStatus] = useState<Parcel['status'] | null>(null);
+    const [statusMap, setStatusMap] = useState<{ [key: string]: Parcel['status'] }>({});
 
     useEffect(() => {
         dispatch(fetchAdminParcels());
-        dispatch(fetchAdminUsers({ role: 'Agent' })); // Fetch only agents for assignment
+        dispatch(fetchAdminUsers({ role: 'Agent' }));
     }, [dispatch]);
 
     const handleAssignAgent = (parcelId: string) => {
@@ -38,12 +37,12 @@ export default function AdminParcels() {
     };
 
     const handleStatusChange = (parcelId: string) => {
-        if (selectedStatus) {
-            dispatch(updateParcelStatus({ parcelId, status: selectedStatus }))
+        const status = statusMap[parcelId];
+        if (status) {
+            dispatch(updateParcelStatus({ parcelId, status }))
                 .unwrap()
                 .then(() => {
                     toast.success("Parcel status updated successfully!");
-                    setSelectedStatus(null);
                 })
                 .catch((err) => {
                     toast.error(err.message || "Failed to update parcel status");
@@ -51,6 +50,10 @@ export default function AdminParcels() {
         } else {
             toast.error("Please select a status.");
         }
+    };
+
+    const handleStatusSelectChange = (parcelId: string, status: Parcel['status']) => {
+        setStatusMap(prev => ({ ...prev, [parcelId]: status }));
     };
 
     if (loading) return <p>Loading parcels...</p>;
@@ -84,8 +87,8 @@ export default function AdminParcels() {
                                 <td className="px-6 py-4">{(parcel.agentId as User)?.name || 'Unassigned'}</td>
                                 <td className="px-6 py-4">
                                     <select
-                                        value={parcel.status}
-                                        onChange={(e) => setSelectedStatus(e.target.value as Parcel['status'])}
+                                        value={statusMap[parcel._id] || parcel.status}
+                                        onChange={(e) => handleStatusSelectChange(parcel._id, e.target.value as Parcel['status'])}
                                         className="border rounded p-1 cursor-pointer"
                                     >
                                         <option value="Pending">Pending</option>
