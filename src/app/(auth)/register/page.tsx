@@ -183,7 +183,6 @@ export default function Register() {
                     >
                         <option value="Customer">Customer</option>
                         <option value="Agent">Agent</option>
-                        <option value="Admin">Admin</option>
                     </select>
                     {errors.role && <p className="text-red-500 text-sm">{errors.role}</p>}
                 </div>
