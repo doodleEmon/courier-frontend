@@ -16,6 +16,12 @@ export interface Location {
     longitude: number;
 }
 
+export interface TrackingHistoryEntry {
+    status: Parcel['status'];
+    location?: Location;
+    timestamp?: string;
+}
+
 // Parcel Types
 export interface Parcel {
     _id: string;
@@ -35,6 +41,7 @@ export interface Parcel {
     qrCode?: string;
     createdAt: string;
     updatedAt: string;
+    trackingHistory: TrackingHistoryEntry[];
 }
 
 export interface ParcelState {

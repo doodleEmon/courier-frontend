@@ -1,17 +1,15 @@
-"use client"
+'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
-import Footer from './Footer';
 import { BiHome } from 'react-icons/bi';
-import { IoCreateOutline } from 'react-icons/io5';
 import { BsClipboard2Check } from 'react-icons/bs';
-import { CgProfile, CgTrack } from 'react-icons/cg';
+import { CgProfile } from 'react-icons/cg';
 
 // Navigation data
 const navigation = [
     { href: '/delivery/dashboard', label: 'Dashboard', icon: BiHome },
-    { href: '/delivery/parcels', label: 'Parcels', icon: BsClipboard2Check },
+    { href: '/delivery/parcels', label: 'My Parcels', icon: BsClipboard2Check },
     { href: '/delivery/profile', label: 'Profile', icon: CgProfile },
 ];
 
@@ -24,8 +22,8 @@ export default function DeliveryLayout({
 
     // Function to check if a link is active
     const isActive = (href: string) => {
-        if (href === '/delivery/dashboard') {
-            return pathname === '/delivery/dashboard';
+        if (href === '/delivery/parcels') {
+            return pathname === '/delivery/parcels';
         }
         return pathname.startsWith(href);
     };
@@ -33,7 +31,7 @@ export default function DeliveryLayout({
     return (
         <div className="flex h-full">
             {/* Sidebar */}
-            <aside className="w-64 bg-gradient-to-b from-blue-600 to-purple-600 text-white p-5 flex-shrink-0">
+            <aside className="w-64 bg-gradient-to-b from-green-600 to-teal-600 text-white p-5 flex-shrink-0">
                 <nav className="flex flex-col gap-2">
                     {navigation.map((item) => {
                         const Icon = item.icon;
@@ -43,8 +41,8 @@ export default function DeliveryLayout({
                             <Link
                                 key={item.href}
                                 className={`flex items-center ${extraPadding} py-2 rounded-lg gap-x-3 transition-all duration-200 ${active
-                                        ? 'bg-white text-blue-600 shadow-md'
-                                        : 'hover:bg-blue-500 hover:bg-opacity-50'
+                                        ? 'bg-white text-green-600 shadow-md'
+                                        : 'hover:bg-green-500 hover:bg-opacity-50'
                                     }`}
                                 href={item.href}
                             >

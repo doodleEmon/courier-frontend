@@ -2,7 +2,7 @@
 
 import { logout } from '@/redux/slices/auth/authSlice';
 import { AppDispatch, RootState } from '@/redux/store';
-import { AuthResponse, AuthState } from '@/types/type';
+import { AuthResponse } from '@/types/type';
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';

@@ -1,15 +1,20 @@
-# Admin backend controller
+## Agent backend controller
+
 import Parcel from "../models/parcelModel.js";
 import User from "../models/userModel.js";
 
-// @desc    Get all parcels for the admin dashboard
-// @route   GET /api/parcels/admin
-// @access  Private/Admin
-export const getAdminParcels = async (req, res) => {
+// @desc    Get parcels assigned to a delivery agent
+// @route   GET /api/agent/parcels
+// @access  Private/Agent
+export const getAgentParcels = async (req, res) => {
     try {
-        const parcels = await Parcel.find()
+        const parcels = await Parcel.find({ agentId: req.user._id })
             .populate("customerId", "name email")
-            .populate("agentId", "name email");
+            .sort({ createdAt: -1 });
+
+        if (!parcels) {
+            return res.status(404).json({ message: "No parcels found for this agent" });
+        }
 
         res.status(200).json(parcels);
     } catch (error) {
@@ -17,25 +22,52 @@ export const getAdminParcels = async (req, res) => {
     }
 };
 
-// @desc    Assign an agent to a parcel
-// @route   PUT /api/parcels/assign/:id
-// @access  Private/Admin
-export const assignAgentToParcel = async (req, res) => {
+// @desc    Update parcel status
+// @route   PUT /api/agent/parcels/:id/status
+// @access  Private/Agent
+export const updateParcelStatus = async (req, res) => {
     try {
-        const { agentId } = req.body;
+        const { status, latitude, longitude } = req.body;
         const parcel = await Parcel.findById(req.params.id);
-        const agent = await User.findById(agentId);
 
         if (!parcel) {
             return res.status(404).json({ message: "Parcel not found" });
         }
 
-        if (!agent || agent.role !== "Agent") {
-            return res.status(404).json({ message: "Invalid agent ID provided" });
+        if (parcel.agentId && parcel.agentId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized to update this parcel" });
         }
 
-        parcel.agentId = agentId;
+        // Validate status
+        const allowedStatusUpdates = ['Picked Up', 'In Transit', 'Delivered', 'Failed'];
+        if (!allowedStatusUpdates.includes(status)) {
+            return res.status(400).json({ message: "Invalid status update" });
+        }
+
+        parcel.status = status;
+
+        // Add location to tracking history
+        if (latitude && longitude) {
+            parcel.currentLocation = { latitude, longitude };
+            parcel.trackingHistory.push({
+                status,
+                location: { latitude, longitude },
+            });
+        } else {
+            parcel.trackingHistory.push({ status });
+        }
+
         await parcel.save();
+
+        // Get the `io` instance from the request
+        const io = req.app.get('socketio');
+
+        // Emit a real-time update
+        io.emit('parcelStatusUpdate', {
+            parcelId: parcel._id,
+            status: parcel.status,
+            currentLocation: parcel.currentLocation,
+        });
 
         res.status(200).json(parcel);
     } catch (error) {
@@ -43,144 +75,116 @@ export const assignAgentToParcel = async (req, res) => {
     }
 };
 
-
-// @desc    Assign an agent to a parcel
-// @route   PUT /api/admin/assign/:id
-// @access  Private/Admin
-export const getAdminUsers = async (req, res) => {
+// @desc    Get agent profile
+// @route   GET /api/agent/profile
+// @access  Private/Agent
+export const getAgentProfile = async (req, res) => {
     try {
-        // Add pagination
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+        const agent = await User.findById(req.user._id).select("-password");
 
-        // Add filtering options (optional)
-        const filter = {};
-        if (req.query.role) filter.role = req.query.role;
-        if (req.query.isActive) filter.isActive = req.query.isActive === 'true';
+        if (!agent) {
+            return res.status(404).json({ message: "Agent not found" });
+        }
 
-        // Get users with optional filtering and pagination
-        const users = await User.find(filter)
-            .select('-password') // Exclude passwords
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit);
+        res.status(200).json(agent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-        // Get total count for pagination info
-        const total = await User.countDocuments(filter);
+// @desc    Get optimized delivery route for the agent
+// @route   GET /api/agent/route
+// @access  Private/Agent
+export const getOptimizedDeliveryRoute = async (req, res) => {
+    try {
+        const agentParcels = await Parcel.find({
+            agentId: req.user._id,
+            status: { $in: ['Accepted', 'Picked Up', 'In Transit'] }
+        })
+            .select('pickupAddress deliveryAddress status')
+            .sort({ createdAt: 1 }); // Process oldest parcels first
 
+        if (!agentParcels || agentParcels.length === 0) {
+            return res.status(404).json({ message: "No active parcels to generate a route for." });
+        }
+
+        // Prepare waypoints for Google Maps API
+        const waypoints = agentParcels.map(parcel => ({
+            location: parcel.deliveryAddress,
+            stopover: true,
+        }));
+
+        // The agent's starting point could be their current location or a default address
+        const origin = "Agent's Current Location or Office Address"; // Replace with actual data
+
+        // The final destination could be the last parcel's delivery address
+        const destination = waypoints.pop().location;
+
+        // Construct the Google Maps Directions API URL
+        const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+        if (!googleMapsApiKey) {
+            return res.status(500).json({ message: "Google Maps API key is missing." });
+        }
+
+        const mapsApiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=optimize:true|${waypoints.map(wp => encodeURIComponent(wp.location)).join('|')}&key=${googleMapsApiKey}`;
+
+        // Fetch the optimized route from Google Maps
+        const response = await fetch(mapsApiUrl);
+        const data = await response.json();
+
+        if (data.status !== 'OK') {
+            return res.status(500).json({
+                message: "Failed to fetch optimized route from Google Maps.",
+                error: data.error_message || data.status
+            });
+        }
+
+        // Send the optimized route to the agent
         res.status(200).json({
-            users,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            }
+            route: data.routes[0], // The first route is the optimized one
+            parcels: agentParcels,
         });
+
     } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-};
-
-// @desc    Update user role
-// @route   PUT /api/admin/users/:id/role
-// @access  Private/Admin
-export const updateUserRole = async (req, res) => {
-    try {
-        const { role } = req.body;
-        const user = await User.findById(req.params.id);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        if (!['Customer', 'Agent', 'Admin'].includes(role)) {
-            return res.status(400).json({ message: "Invalid role provided" });
-        }
-
-        user.role = role;
-        await user.save();
-
-        res.status(200).json({ message: "User role updated successfully", user });
-    } catch (error) {
-        console.error('Error updating user role:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-};
-
-// @desc    Delete user
-// @route   DELETE /api/admin/users/:id
-// @access  Private/Admin
-export const deleteUser = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        await user.deleteOne();
-
-        res.status(200).json({ message: "User deleted successfully" });
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-};
-
-// @desc    Update parcel status
-// @route   PUT /api/admin/parcels/:id/status
-// @access  Private/Admin
-export const updateParcelStatus = async (req, res) => {
-    try {
-        const { status } = req.body;
-        const parcel = await Parcel.findById(req.params.id);
-
-        if (!parcel) {
-            return res.status(404).json({ message: "Parcel not found" });
-        }
-
-        if (!['Pending', 'Accepted', 'Picked Up', 'In Transit', 'Delivered', 'Failed'].includes(status)) {
-            return res.status(400).json({ message: "Invalid parcel status provided" });
-        }
-
-        parcel.status = status;
-        await parcel.save();
-
-        res.status(200).json({ message: "Parcel status updated successfully", parcel });
-    } catch (error) {
-        console.error('Error updating parcel status:', error);
-        res.status(500).json({
-            message: 'Internal server error',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        console.error("Error in getOptimizedDeliveryRoute:", error);
+        res.status(500).json({ message: "Internal server error." });
     }
 };
 
 
-# Admin banckend route
+## Agent backend routes
+
 import express from 'express';
-import { assignAgentToParcel, getAdminParcels, getAdminUsers, updateUserRole, deleteUser, updateParcelStatus } from '../controllers/adminController.js';
+import { getAgentParcels, updateParcelStatus, getAgentProfile, getOptimizedDeliveryRoute } from '../controllers/agentController.js';
 import { authorize, protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get("/users", protect, authorize("Admin"), getAdminUsers);
-router.put("/users/:id/role", protect, authorize("Admin"), updateUserRole);
-router.delete("/users/:id", protect, authorize("Admin"), deleteUser);
-router.get("/parcels", protect, authorize("Admin"), getAdminParcels);
-router.put("/assign/:id", protect, authorize("Admin"), assignAgentToParcel);
-router.put("/parcels/:id/status", protect, authorize("Admin"), updateParcelStatus);
+// Delivery Agent APIs
+router.get("/profile", protect, authorize("Agent"), getAgentProfile);
+router.get("/parcels", protect, authorize("Agent"), getAgentParcels);
+router.put("/parcels/:id/status", protect, authorize("Agent"), updateParcelStatus);
+router.get("/route", protect, authorize("Agent"), getOptimizedDeliveryRoute);
 
 export default router;
+
+
+## backend server.js
+
+import express from 'express';
+import { getAgentParcels, updateParcelStatus, getAgentProfile, getOptimizedDeliveryRoute } from '../controllers/agentController.js';
+import { authorize, protect } from '../middleware/authMiddleware.js';
+
+const router = express.Router();
+
+// Delivery Agent APIs
+router.get("/profile", protect, authorize("Agent"), getAgentProfile);
+router.get("/parcels", protect, authorize("Agent"), getAgentParcels);
+router.put("/parcels/:id/status", protect, authorize("Agent"), updateParcelStatus);
+router.get("/route", protect, authorize("Agent"), getOptimizedDeliveryRoute);
+
+export default router;
+
+
+
+## these are agent related code in the backend. implement the agent functionality by following these backend code. and in the frontend follow admin and customer functionality how i implement them and then implement the agent logic and functionality. Don't make any error. And each design you will create must be responsive.
