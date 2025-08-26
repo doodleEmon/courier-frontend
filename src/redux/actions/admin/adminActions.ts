@@ -12,7 +12,7 @@ export const fetchAdminParcels = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/admin/parcels`, {
+            const response = await fetch(`${BASE_URL}/api/admin/parcels`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ export const assignAgent = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/admin/assign/${parcelId}`, {
+            const response = await fetch(`${BASE_URL}/api/admin/assign/${parcelId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export const fetchAdminUsers = createAsyncThunk(
         }
         const query = new URLSearchParams(params as any).toString();
         try {
-            const response = await fetch(`${BASE_URL}/admin/users?${query}`, {
+            const response = await fetch(`${BASE_URL}/api/admin/users?${query}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export const updateUserRole = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/admin/users/${userId}/role`, {
+            const response = await fetch(`${BASE_URL}/api/admin/users/${userId}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export const deleteUser = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/admin/users/${userId}`, {
+            const response = await fetch(`${BASE_URL}/api/admin/users/${userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ export const updateParcelStatus = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/admin/parcels/${parcelId}/status`, {
+            const response = await fetch(`${BASE_URL}/api/admin/parcels/${parcelId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

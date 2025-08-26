@@ -13,7 +13,7 @@ export const getAgentParcels = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/agent/parcels`, {
+            const response = await fetch(`${BASE_URL}/api/agent/parcels`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export const updateParcelStatus = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/agent/parcels/${parcelId}/status`,
+            const response = await fetch(`${BASE_URL}/api/agent/parcels/${parcelId}/status`,
                 {
                     method: 'PUT',
                     headers: {
@@ -71,7 +71,7 @@ export const getAgentProfile = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/agent/profile`, {
+            const response = await fetch(`${BASE_URL}/api/agent/profile`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export const getOptimizedDeliveryRoute = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const response = await fetch(`${BASE_URL}/agent/route`, {
+            const response = await fetch(`${BASE_URL}/api/agent/route`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
