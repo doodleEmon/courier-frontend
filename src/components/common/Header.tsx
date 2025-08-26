@@ -42,18 +42,48 @@ export default function Header() {
                 </Link>
                 {/* Navigation */}
                 <div className="hidden md:flex gap-6 items-center">
-                    <Link href="/parcels" className="text-gray-700 hover:text-blue-600 font-medium transition">
-                        Parcels
-                    </Link>
-                    <Link href="/agents" className="text-gray-700 hover:text-blue-600 font-medium transition">
-                        Agents
-                    </Link>
-                    <Link href="/customer/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition">
-                        Dashboard
-                    </Link>
+                    {user && user.role === 'Admin' && (
+                        <>
+                            <Link href="/admin/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Dashboard
+                            </Link>
+                            <Link href="/admin/users" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Users
+                            </Link>
+                            <Link href="/admin/parcels" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Parcels
+                            </Link>
+                        </>
+                    )}
+                    {user && user.role === 'Agent' && (
+                        <>
+                            <Link href="/delivery/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Dashboard
+                            </Link>
+                            <Link href="/delivery/parcels" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Parcels
+                            </Link>
+                        </>
+                    )}
+                    {user && user.role === 'Customer' && (
+                        <>
+                            <Link href="/customer/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Dashboard
+                            </Link>
+                            <Link href="/customer/book-parcel" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Book Parcel
+                            </Link>
+                            <Link href="/customer/my-bookings" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                My Bookings
+                            </Link>
+                            <Link href="/customer/tracking" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Track Parcel
+                            </Link>
+                        </>
+                    )}
                 </div>
                 {/* Auth Buttons */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     {user ? (
                         <>
                             <span className="text-gray-700 font-medium">
@@ -68,6 +98,9 @@ export default function Header() {
                         </>
                     ) : (
                         <>
+                            <Link href="/customer/book-parcel" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                                Book Parcel
+                            </Link>
                             <Link
                                 href="/login"
                                 className="px-4 py-2 rounded-md border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition"

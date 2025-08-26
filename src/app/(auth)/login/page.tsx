@@ -34,10 +34,16 @@ export default function Login() {
 
     dispatch(loginUser(form))
       .unwrap()
-      .then(() => {
+      .then((user) => {
         toast.success("Login successful!");
         setTimeout(() => {
-          router.push("/dashboard");
+          if (user.role === 'Admin') {
+            router.push("/admin/dashboard");
+          } else if (user.role === 'Agent') {
+            router.push("/delivery/dashboard");
+          } else {
+            router.push("/customer/dashboard");
+          }
         }, 1000);
       })
       .catch((err) => {
