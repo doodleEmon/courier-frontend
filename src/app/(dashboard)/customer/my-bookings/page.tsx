@@ -59,7 +59,7 @@ export default function MyBookings() {
       .then(() => {
         toast.success("Parcel successfully cancelled!");
         setTimeout(() => {
-          router.push("/my-bookings");
+          router.push("/customer/my-bookings");
         }, 1000);
       })
       .catch((err) => {
@@ -119,7 +119,7 @@ export default function MyBookings() {
         .then(() => {
           toast.success("Parcel booking info updated!");
           setTimeout(() => {
-            router.push("/my-bookings");
+            router.push("/customer/my-bookings");
           }, 1000);
         })
         .catch((err) => {

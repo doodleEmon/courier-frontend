@@ -10,11 +10,11 @@ import { CgProfile, CgTrack } from 'react-icons/cg';
 
 // Navigation data
 const navigation = [
-    { href: '/dashboard', label: 'Dashboard', icon: BiHome },
-    { href: '/book-parcel', label: 'Book Parcel', icon: IoCreateOutline },
-    { href: '/my-bookings', label: 'My Bookings', icon: BsClipboard2Check },
-    { href: '/tracking', label: 'Track Parcel', icon: CgTrack },
-    { href: '/profile', label: 'Profile', icon: CgProfile },
+    { href: '/customer/dashboard', label: 'Dashboard', icon: BiHome },
+    { href: '/customer/book-parcel', label: 'Book Parcel', icon: IoCreateOutline },
+    { href: '/customer/my-bookings', label: 'My Bookings', icon: BsClipboard2Check },
+    { href: '/customer/tracking', label: 'Track Parcel', icon: CgTrack },
+    { href: '/customer/profile', label: 'Profile', icon: CgProfile },
 ];
 
 export default function CustomLayout({

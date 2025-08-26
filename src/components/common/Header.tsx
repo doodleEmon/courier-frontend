@@ -48,7 +48,7 @@ export default function Header() {
                     <Link href="/agents" className="text-gray-700 hover:text-blue-600 font-medium transition">
                         Agents
                     </Link>
-                    <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition">
+                    <Link href="/customer/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition">
                         Dashboard
                     </Link>
                 </div>
