@@ -69,7 +69,7 @@ export interface RegisterData {
 export interface AuthState {
     user: AuthResponse | null;
     loading: boolean;
-    error: any;
+    error: unknown;
 }
 
 // API Response Types
@@ -132,6 +132,23 @@ export interface SocketParcelUpdate {
 export interface RouteParams {
     id?: string;
     trackingNumber?: string;
+}
+
+export interface RouteStep {
+    html_instructions: string;
+    distance: { text: string; value: number };
+    duration: { text: string; value: number };
+    end_location: { lat: number; lng: number };
+    start_location: { lat: number; lng: number };
+    travel_mode: string;
+}
+
+export interface OptimizedRoute {
+    route: {
+        summary: string;
+        legs: Array<{ steps: RouteStep[] }>;
+    };
+    parcels: Parcel[];
 }
 
 // Component Props Types

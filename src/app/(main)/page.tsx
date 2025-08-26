@@ -30,7 +30,7 @@ export default function Home() {
             nextSlide();
         }, 5000); // Change slide every 5 seconds
         return () => clearInterval(interval);
-    }, [currentSlide]);
+    }, [currentSlide, nextSlide]);
 
     return (
         <div className="mt-5 relative w-full mx-auto overflow-hidden rounded-lg shadow-lg max-w-screen-xl">

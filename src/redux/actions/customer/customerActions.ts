@@ -32,8 +32,8 @@ export const createParcel = createAsyncThunk(
             }
 
             return data;
-        } catch (err: any) {
-            return rejectWithValue(err.message || "Something went wrong");
+        } catch (err: unknown) {
+            return rejectWithValue((err as Error).message || "Something went wrong");
         }
     }
 );
@@ -57,8 +57,8 @@ export const fetchCustomerParcels = createAsyncThunk(
             });
             const data = await response.json();
             return data;
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data?.message || "Failed to fetch parcels");
+        } catch (err: unknown) {
+            return rejectWithValue((err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to fetch parcels");
         }
     }
 );
@@ -88,8 +88,8 @@ export const updateParcel = createAsyncThunk(
             }
 
             return data;
-        } catch (err: any) {
-            return rejectWithValue(err.message || "Something went wrong");
+        } catch (err: unknown) {
+            return rejectWithValue((err as Error).message || "Something went wrong");
         }
     }
 );
@@ -104,7 +104,7 @@ export const cancelParcel = createAsyncThunk(
             token = JSON.parse(user).token;
         }
         try {
-            const res = await fetch(`${BASE_URL}/api/customer/parcels/${id}`, {
+            const response = await fetch(`${BASE_URL}/api/customer/parcels/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,8 +112,8 @@ export const cancelParcel = createAsyncThunk(
                 },
             });
             return id;
-        } catch (err: any) {
-            return thunkAPI.rejectWithValue(err.response?.data?.message || "Cancel failed");
+        } catch (err: unknown) {
+            return thunkAPI.rejectWithValue((err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Cancel failed");
         }
     }
 );

@@ -97,7 +97,7 @@ export default function Login() {
           Login
         </button>
         <div className="text-center text-sm mt-2">
-          <span>Don't have an account? </span>
+          <span>Don&apos;t have an account? </span>
           <Link href="/register" className="text-blue-600 hover:underline">
             Register
           </Link>

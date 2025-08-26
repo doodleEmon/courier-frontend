@@ -24,8 +24,8 @@ export const fetchAdminParcels = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to fetch admin parcels');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to fetch admin parcels');
         }
     }
 );
@@ -53,8 +53,8 @@ export const assignAgent = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to assign agent');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to assign agent');
         }
     }
 );
@@ -68,7 +68,7 @@ export const fetchAdminUsers = createAsyncThunk(
         if (user) {
             token = JSON.parse(user).token;
         }
-        const query = new URLSearchParams(params as any).toString();
+        const query = new URLSearchParams(params as Record<string, string>).toString();
         try {
             const response = await fetch(`${BASE_URL}/api/admin/users?${query}`, {
                 method: 'GET',
@@ -82,8 +82,8 @@ export const fetchAdminUsers = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to fetch admin users');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to fetch admin users');
         }
     }
 );
@@ -111,8 +111,8 @@ export const updateUserRole = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to update user role');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to update user role');
         }
     }
 );
@@ -139,8 +139,8 @@ export const deleteUser = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return userId; // Return the ID of the deleted user
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to delete user');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to delete user');
         }
     }
 );
@@ -168,8 +168,8 @@ export const updateParcelStatus = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to update parcel status');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to update parcel status');
         }
     }
 );

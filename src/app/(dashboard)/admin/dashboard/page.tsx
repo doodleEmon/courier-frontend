@@ -7,7 +7,7 @@ import { fetchAdminParcels, fetchAdminUsers } from "@/redux/actions/admin/adminA
 
 export default function Dashboard() {
     const dispatch = useDispatch<AppDispatch>();
-    const { parcels, users, loading, error, usersPagination } = useSelector((state: RootState) => state.admin);
+    const { parcels, loading, error, usersPagination } = useSelector((state: RootState) => state.admin);
 
     useEffect(() => {
         dispatch(fetchAdminParcels());

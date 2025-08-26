@@ -1,7 +1,6 @@
 import { BASE_URL } from '@/constants';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Parcel } from '@/types/type';
-import { RootState } from '@/redux/store';
 
 // Fetch all parcels for agent
 export const getAgentParcels = createAsyncThunk(
@@ -25,8 +24,8 @@ export const getAgentParcels = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to fetch agent parcels');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to fetch agent parcels');
         }
     }
 );
@@ -55,8 +54,8 @@ export const updateParcelStatus = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to update parcel status');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to update parcel status');
         }
     }
 );
@@ -83,8 +82,8 @@ export const getAgentProfile = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to fetch agent profile');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to fetch agent profile');
         }
     }
 );
@@ -111,8 +110,8 @@ export const getOptimizedDeliveryRoute = createAsyncThunk(
                 throw new Error(data.message || `HTTP error! status: ${response.status}`);
             }
             return data;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to fetch optimized route');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to fetch optimized route');
         }
     }
 );

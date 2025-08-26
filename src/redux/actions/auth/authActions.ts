@@ -21,8 +21,8 @@ export const loginUser = createAsyncThunk(
       }
 
       return data;
-    } catch (err: any) {
-      return rejectWithValue(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      return rejectWithValue((err as Error).message || "Something went wrong");
     }
   }
 );
@@ -47,8 +47,8 @@ export const registerUser = createAsyncThunk(
       }
 
       return data;
-    } catch (err: any) {
-      return rejectWithValue(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      return rejectWithValue((err as Error).message || "Something went wrong");
     }
   }
 );

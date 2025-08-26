@@ -25,7 +25,7 @@ export default function AgentTracking() {
                     <p>{route.route.summary}</p>
                     <h2 className="text-lg font-semibold mt-4">Steps:</h2>
                     <ul>
-                        {route.route.legs[0].steps.map((step: any, index: number) => (
+                        {route.route.legs[0].steps.map((step: RouteStep, index: number) => (
                             <li key={index} dangerouslySetInnerHTML={{ __html: step.html_instructions }} />
                         ))}
                     </ul>

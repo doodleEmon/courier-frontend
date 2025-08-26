@@ -6,7 +6,7 @@ import { Parcel, User } from '@/types/type';
 interface AgentState {
     parcels: Parcel[];
     profile: User | null;
-    route: any | null; // Adjust the type based on the actual route data structure
+    route: OptimizedRoute | null; // Adjust the type based on the actual route data structure
     loading: boolean;
     error: string | null;
 }
