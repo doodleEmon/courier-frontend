@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import React from 'react'
 import { BiHome } from 'react-icons/bi';
 import { BsClipboard2Check } from 'react-icons/bs';
-import { CgProfile } from 'react-icons/cg';
+import { CgProfile, CgTrack } from 'react-icons/cg';
 
 // Navigation data
 const navigation = [

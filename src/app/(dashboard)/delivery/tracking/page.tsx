@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { getOptimizedDeliveryRoute } from '@/redux/actions/agent/agentActions';
+import { RouteStep } from '@/types/type';
 
 export default function AgentTracking() {
     const dispatch = useDispatch<AppDispatch>();

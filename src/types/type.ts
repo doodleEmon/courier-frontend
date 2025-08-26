@@ -69,7 +69,7 @@ export interface RegisterData {
 export interface AuthState {
     user: AuthResponse | null;
     loading: boolean;
-    error: unknown;
+    error: string | null;
 }
 
 // API Response Types

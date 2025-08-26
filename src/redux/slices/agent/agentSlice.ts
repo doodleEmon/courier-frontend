@@ -1,7 +1,7 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 import { getAgentParcels, updateParcelStatus, getAgentProfile, getOptimizedDeliveryRoute } from '@/redux/actions/agent/agentActions';
-import { Parcel, User } from '@/types/type';
+import { Parcel, User, OptimizedRoute } from '@/types/type';
 
 interface AgentState {
     parcels: Parcel[];
