@@ -1,36 +1,186 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Admin backend controller
+import Parcel from "../models/parcelModel.js";
+import User from "../models/userModel.js";
 
-## Getting Started
+// @desc    Get all parcels for the admin dashboard
+// @route   GET /api/parcels/admin
+// @access  Private/Admin
+export const getAdminParcels = async (req, res) => {
+    try {
+        const parcels = await Parcel.find()
+            .populate("customerId", "name email")
+            .populate("agentId", "name email");
 
-First, run the development server:
+        res.status(200).json(parcels);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+// @desc    Assign an agent to a parcel
+// @route   PUT /api/parcels/assign/:id
+// @access  Private/Admin
+export const assignAgentToParcel = async (req, res) => {
+    try {
+        const { agentId } = req.body;
+        const parcel = await Parcel.findById(req.params.id);
+        const agent = await User.findById(agentId);
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+        if (!parcel) {
+            return res.status(404).json({ message: "Parcel not found" });
+        }
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+        if (!agent || agent.role !== "Agent") {
+            return res.status(404).json({ message: "Invalid agent ID provided" });
+        }
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+        parcel.agentId = agentId;
+        await parcel.save();
 
-## Learn More
+        res.status(200).json(parcel);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+// @desc    Assign an agent to a parcel
+// @route   PUT /api/admin/assign/:id
+// @access  Private/Admin
+export const getAdminUsers = async (req, res) => {
+    try {
+        // Add pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+        // Add filtering options (optional)
+        const filter = {};
+        if (req.query.role) filter.role = req.query.role;
+        if (req.query.isActive) filter.isActive = req.query.isActive === 'true';
 
-## Deploy on Vercel
+        // Get users with optional filtering and pagination
+        const users = await User.find(filter)
+            .select('-password') // Exclude passwords
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+        // Get total count for pagination info
+        const total = await User.countDocuments(filter);
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+        res.status(200).json({
+            users,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+// @desc    Update user role
+// @route   PUT /api/admin/users/:id/role
+// @access  Private/Admin
+export const updateUserRole = async (req, res) => {
+    try {
+        const { role } = req.body;
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!['Customer', 'Agent', 'Admin'].includes(role)) {
+            return res.status(400).json({ message: "Invalid role provided" });
+        }
+
+        user.role = role;
+        await user.save();
+
+        res.status(200).json({ message: "User role updated successfully", user });
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/admin/users/:id
+// @access  Private/Admin
+export const deleteUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        await user.deleteOne();
+
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+// @desc    Update parcel status
+// @route   PUT /api/admin/parcels/:id/status
+// @access  Private/Admin
+export const updateParcelStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const parcel = await Parcel.findById(req.params.id);
+
+        if (!parcel) {
+            return res.status(404).json({ message: "Parcel not found" });
+        }
+
+        if (!['Pending', 'Accepted', 'Picked Up', 'In Transit', 'Delivered', 'Failed'].includes(status)) {
+            return res.status(400).json({ message: "Invalid parcel status provided" });
+        }
+
+        parcel.status = status;
+        await parcel.save();
+
+        res.status(200).json({ message: "Parcel status updated successfully", parcel });
+    } catch (error) {
+        console.error('Error updating parcel status:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+
+# Admin banckend route
+import express from 'express';
+import { assignAgentToParcel, getAdminParcels, getAdminUsers, updateUserRole, deleteUser, updateParcelStatus } from '../controllers/adminController.js';
+import { authorize, protect } from '../middleware/authMiddleware.js';
+
+const router = express.Router();
+
+router.get("/users", protect, authorize("Admin"), getAdminUsers);
+router.put("/users/:id/role", protect, authorize("Admin"), updateUserRole);
+router.delete("/users/:id", protect, authorize("Admin"), deleteUser);
+router.get("/parcels", protect, authorize("Admin"), getAdminParcels);
+router.put("/assign/:id", protect, authorize("Admin"), assignAgentToParcel);
+router.put("/parcels/:id/status", protect, authorize("Admin"), updateParcelStatus);
+
+export default router;

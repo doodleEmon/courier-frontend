@@ -19,8 +19,8 @@ export interface Location {
 // Parcel Types
 export interface Parcel {
     _id: string;
-    customerId: string;
-    agentId: string;
+    customerId: string | User;
+    agentId: string | User;
     recipientName: string;
     recipientPhone: string;
     pickupAddress: string;
